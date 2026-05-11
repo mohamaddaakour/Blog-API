@@ -1,7 +1,7 @@
 import prisma from "../config/prisma";
 import { AppError } from "../utils/AppError";
 import bcrypt from "bcrypt";
-import jsonwebtoken from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 export async function registerUser(username: string, email: string, password: string) {
     const existingUser = await prisma.user.findFirst({
@@ -33,51 +33,22 @@ export async function registerUser(username: string, email: string, password: st
     return user;
 }
 
-// export const loginUser = async (
-//     email: string,
-//     password: string
-// ) => {
-//     const user = await prisma.user.findUnique({
-//         where: {
-//             email
-//         }
-//     });
+export async function loginUser(email: string, password: string) {
+    const user = await prisma.user.findUnique({
+        where: { email }
+    });
 
-//     if (!user) {
-//         throw new AppError(
-//             "Invalid credentials",
-//             401
-//         );
-//     }
+    if (!user) {
+        throw new AppError("Invalid credentials", 401);
+    }
 
-//     const isPasswordValid = await bcrypt.compare(
-//         password,
-//         user.password
-//     );
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
-//     if (!isPasswordValid) {
-//         throw new AppError(
-//             "Invalid credentials",
-//             401
-//         );
-//     }
+    if (!isPasswordValid) {
+        throw new AppError("Invalid credentials", 401);
+    }
 
-//     const token = jwt.sign(
-//         {
-//             userId: user.id
-//         },
-//         process.env.JWT_SECRET as string,
-//         {
-//             expiresIn: "7d"
-//         }
-//     );
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "7d" });
 
-//     return {
-//         token,
-//         user: {
-//             id: user.id,
-//             username: user.username,
-//             email: user.email
-//         }
-//     };
-// };
+    return { token, user: { id: user.id, username: user.username, email: user.email } };
+}

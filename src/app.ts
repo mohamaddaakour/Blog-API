@@ -4,6 +4,7 @@ import morgan from "morgan";
 import cors from "cors";
 
 import userRoutes from "./routes/user.routes";
+import authRoutes from "./routes/auth.routes";
 
 import { errorMiddleware } from "./middlewares/error.middleware";
 import { notFoundMiddleware } from "./middlewares/notFound.middleware";
@@ -23,6 +24,7 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use(notFoundMiddleware);
 
