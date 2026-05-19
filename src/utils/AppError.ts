@@ -1,12 +1,10 @@
+// create a new Error type that handles status code and message
 export class AppError extends Error {
     statusCode: number;
 
-    constructor(message: string, statusCode: number) {
+    constructor(statusCode: number, message: string) {
         super(message);
         this.statusCode = statusCode;
-        this.name = "App Error";
-
-        // this is used to keep the stack trace clean
-        Error.captureStackTrace(this, this.constructor);
+        this.name = "AppError";
     }
 }

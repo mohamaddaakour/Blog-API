@@ -1,30 +1,10 @@
 import { Router } from "express";
-import { getMe } from "../controllers/auth.controller";
-import { protect } from "../middlewares/auth.middleware";
-
-import {
-    login,
-    register
-} from "../controllers/auth.controller";
-
 import { asyncHandler } from "../utils/asyncHandler";
+import { login, register } from "../controllers/auth.controller";
 
-const router = Router();
+const authRoutes: Router = Router();
 
-router.post(
-    "/register",
-    asyncHandler(register)
-);
+authRoutes.post("/register", asyncHandler(register));
+authRoutes.post("/login", asyncHandler(login));
 
-router.post(
-    "/login",
-    asyncHandler(login)
-);
-
-router.get(
-    "/me",
-    protect,
-    asyncHandler(getMe)
-);
-
-export default router;
+export default authRoutes;

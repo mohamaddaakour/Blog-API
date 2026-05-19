@@ -1,54 +1,58 @@
 import prisma from "../config/prisma";
+import { LoginResponse, User } from "../types/user.types";
 import { AppError } from "../utils/AppError";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export async function registerUser(username: string, email: string, password: string) {
-    const existingUser = await prisma.user.findFirst({
+export async function registerService(username: string, email: string, password: string): Promise<User> {
+    const isUserExist: User | null = await prisma.user.findFirst({
         where: {
-            OR: [{email}, {password}]
+            OR: [{ email }, {username}]
         }
     });
 
-    if (existingUser) {
-        throw new AppError("User already exist", 400);
+    if (isUserExist) {
+        throw new AppError(400, "User is already taken");
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword: string = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
+    const user: User = await prisma.user.create({
         data: {
             username,
             email,
             password: hashedPassword
         },
         select: {
-            id: true,
+            userId: true,
             username: true,
             email: true,
+            password: true,
             createdAt: true
         }
     });
-    
+
     return user;
 }
 
-export async function loginUser(email: string, password: string) {
-    const user = await prisma.user.findUnique({
-        where: { email }
+export async function loginService(email: string, password: string): Promise<LoginResponse> {
+    const user: User | null = await prisma.user.findFirst({
+        where: {
+            email
+        }
     });
 
     if (!user) {
-        throw new AppError("Invalid credentials", 401);
+        throw new AppError(401, "No user with this credentials");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPassword: boolean = await bcrypt.compare(password, user.password);
 
-    if (!isPasswordValid) {
-        throw new AppError("Invalid credentials", 401);
+    if (!isPassword) {
+        throw new AppError(401, "Incorrect credentials");
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: "7d" });
+    const token = jwt.sign({ userId: user.userId }, process.env.JWT_SECRET as string, { expiresIn: "7d" } );
 
-    return { token, user: { id: user.id, username: user.username, email: user.email } };
+    return { user, token };
 }

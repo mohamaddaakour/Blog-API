@@ -1,52 +1,30 @@
 import { Request, Response } from "express";
-import { AuthRequest } from "../middlewares/auth.middleware";
+import type { LoginResponse, User } from "../types/user.types";
+import { loginService, registerService } from "../services/auth.service";
 
-import {
-    loginUser,
-    registerUser
-} from "../services/auth.service";
-
-export const register = async (
-    req: Request,
-    res: Response
-) => {
+export async function register(req: Request, res: Response): Promise<Response> {
     const { username, email, password } = req.body;
 
-    const user = await registerUser(
-        username,
-        email,
-        password
-    );
+    const newUser: User = await registerService(username, email, password);
 
-    res.status(201).json({
-        success: true,
-        data: user
-    });
-};
+    if (!newUser) {
+        return res.status(400).json({ success: false, message: "Error in creating the user" });
+    }
 
-export const login = async (
-    req: Request,
-    res: Response
-) => {
+    return res.status(201).json({ success: true, data: newUser });
+}
+
+export async function login(req: Request, res: Response): Promise<Response> {
     const { email, password } = req.body;
 
-    const data = await loginUser(
-        email,
-        password
-    );
+    const user: LoginResponse = await loginService(email, password);
 
-    res.status(200).json({
-        success: true,
-        data
+    res.cookie("token", user.token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000
     });
-};
 
-export const getMe = async (
-    req: AuthRequest,
-    res: Response
-) => {
-    res.status(200).json({
-        success: true,
-        data: req.user
-    });
-};
+    return res.status(200).json({ success: true, data: user.user });
+}

@@ -1,9 +1,12 @@
 import { Router } from "express";
-import { getUsers } from "../controllers/user.controller";
 import { asyncHandler } from "../utils/asyncHandler";
+import { deleteUserById, getAllUsers, getUserById, updateUserById } from "../controllers/user.controller";
 
-const router = Router();
+const userRoutes: Router = Router();
 
-router.get("/", asyncHandler(getUsers));
+userRoutes.get("/allUsers", asyncHandler(getAllUsers));
+userRoutes.get("/user/:userId", asyncHandler(getUserById));
+userRoutes.put("/update/:userId", asyncHandler(updateUserById));
+userRoutes.delete("/delete/:userId", asyncHandler(deleteUserById));
 
-export default router;
+export default userRoutes;

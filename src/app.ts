@@ -1,32 +1,29 @@
 import express from "express";
-import helmet from "helmet";
-import morgan from "morgan";
-import cors from "cors";
-
-import userRoutes from "./routes/user.routes";
-import authRoutes from "./routes/auth.routes";
-
+import type { Express } from "express";
+import { Request, Response } from "express";
 import { errorMiddleware } from "./middlewares/error.middleware";
-import { notFoundMiddleware } from "./middlewares/notFound.middleware";
+import { notFoundError } from "./middlewares/notFound.middleware";
+import cookieParser from "cookie-parser";
 
-const app = express();
+// routes
+import authRoutes from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
+import postRoutes from "./routes/post.routes";
 
-app.use(helmet());
-app.use(cors());
-app.use(morgan("dev"));
+const app: Express = express();
+
 app.use(express.json());
+app.use(cookieParser());
 
-app.get("/", (_req, res) => {
-    res.status(200).json({
-        success: true,
-        message: "Blog API running successfully"
-    });
+app.get("/api/health", (_req: Request, res: Response) => {
+    res.status(200).json({ success: true, message: "Server is listening successfully" });
 });
 
-app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes);
 
-app.use(notFoundMiddleware);
+app.use(notFoundError);
 
 app.use(errorMiddleware);
 
