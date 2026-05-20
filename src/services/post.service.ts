@@ -138,3 +138,25 @@ export async function updatePostService(postId: number, userId: number, title?: 
         }
     });
 };
+
+export async function deletePostService(postId: number, userId: number) {
+    const existingPost = await prisma.post.findUnique({
+        where: {
+            postId
+        }
+    });
+
+    if (!existingPost) {
+        throw new AppError(404, "Post not found");
+    }
+
+    if (existingPost.authorId !== userId) {
+        throw new AppError(403, "Not authorized to delete this post");
+    }
+
+    await prisma.post.delete({
+        where: {
+            postId
+        }
+    });
+};

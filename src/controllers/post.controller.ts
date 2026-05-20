@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import type { Post } from "../types/post.types";
-import { createPostService, getAllPostsService, getPostByIdService, updatePostService } from "../services/post.service";
+import { createPostService, deletePostService, getAllPostsService, getPostByIdService, updatePostService } from "../services/post.service";
 import { AppError } from "../utils/AppError";
 import type { AuthRequest } from "../middlewares/auth.middleware";
 
@@ -39,4 +39,10 @@ export async function updatePost(req: AuthRequest, res: Response) {
     const post = await updatePostService(Number(req.params.id), req.user.id, title, content);
 
     res.status(200).json({ success: true, data: post });
+};
+
+export async function deletePost(req: AuthRequest, res: Response) {
+    await deletePostService(Number(req.params.postId), req.user.userId);
+
+    res.status(200).json({ success: true, message: "Post deleted successfully" });
 };
