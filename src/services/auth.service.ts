@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 export async function registerService(username: string, email: string, password: string): Promise<User> {
     const isUserExist: User | null = await prisma.user.findFirst({
         where: {
-            OR: [{ email }, {username}]
+            OR: [{ email }, { username }]
         }
     });
 

@@ -27,7 +27,7 @@ export async function createPostService(authorId: number, title: string, content
 export async function getAllPostsService(page: number, nbPostsInPage: number, search?: string) {
     const skip: number = (page * nbPostsInPage) - nbPostsInPage;
 
-        const whereClause: Prisma.PostWhereInput = search ? {
+        const whereClause = search ? {
               OR: [
                   {
                       title: {

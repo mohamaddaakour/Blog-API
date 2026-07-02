@@ -1,4 +1,4 @@
-# Definition
+# **Definition**
 
 - A Backend project Written in Typescript within I used:
     - Express as a backend framework
@@ -11,41 +11,20 @@
     - authorization
     - pagination
     - encryption to store passwords
-    - some security
+    - security
 
+```
+The request flow: Client -> Route -> Controller -> Service -> Database
 
-## How to set up Prisma:
-
-```shell
-npm install prisma@5 @prisma/client@5
-
-npx prisma init
-
-npx prisma migrate dev --name init
-
-npx prisma generate
+The response flow: Database -> Service -> Controller -> Client
 ```
 
-```ts
-// in src/config/prisma.ts
-
-// this is the prisma client it acts as an intermediary
-// between the typescript code and database
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient({
-  log: ["query", "info", "warn", "error"]
-});
-
-export default prisma;
-```
-
-## How to the code
+# **How to Run The Code**
 
 ```shell
 npm run dev
 ```
 
-## Author
+# Author
 
 - Mohamad Daakour
